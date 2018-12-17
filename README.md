@@ -2,11 +2,12 @@
 [Project Euler](https://projecteuler.net/archives) JS Solutions
 
 ## Getting Started
-  This is a js solutions for [Project Euler](https://projecteuler.net/archives) JS Solutions.check In that site
+  This is a js solutions for [Project Euler](https://projecteuler.net/archives).check In that site
   
 ## Usage example
 
-Just run js in browser console or in node
+Just run js in browser console or in node.
+I just added problem in top of the js 
 
 ## Meta
 
