@@ -10,7 +10,7 @@ Just run js in browser console or in node
 
 ## Meta
 
-Ramesh Singer – rameshsinger93@gmail.com.com
+Ramesh Singer – rameshsinger93@gmail.com
 
 [https://github.com/rameshsinger/project-euler-js-solutions](https://github.com/rameshsinger/)
 
