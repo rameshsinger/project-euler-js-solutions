@@ -1,0 +1,264 @@
+/* 
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+
+/**  KEYCODES  **/
+
+/*
+ BACKSPACE = 8;
+ TAB = 9;
+ DELETE = 46;
+ ESCAPE = 27;
+ ENTER = 13;
+ DECIMAL POINT = 110;
+ A-Z = 65 TO 90;
+ END,HOME,LEFT,UP,RIGHTDOWN ARROWS = 35 to 40;
+ KeyBoard(0-9) = 48 to 57;
+ NumPad(0-9) = 96 to 105;
+ */
+/** ONLY NUMERIC **/
+$(document).on('keydown', "input[field-validator='numericField']", function (e) {
+    if (e.ctrlKey === true && e.keyCode === 86) {//Added By Ramesh Singer At 28/06/2018 For Copy Paste Not Allowed In Integer Field
+        var scope = $(this);
+        (function () {
+            var value = $(scope).val();
+            var reg = /\D/g;
+            var flag = reg.test(value);
+            if(!flag){
+            $(scope).val(value);
+            }else{
+                $(scope).val('');
+            }
+        }).async();
+        return true;
+    }
+    if ($.inArray(e.keyCode, [46, 8, 9, 27, 13]) !== -1 ||
+            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+            (e.keyCode >= 35 && e.keyCode <= 40)) {
+        return;
+    }
+    if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+        e.preventDefault();
+    }
+});
+/** ALPHA NUMERIC **/
+$(document).on('keydown', "input[field-validator='alphaNumericField']", function (e) {
+    if ($.inArray(e.keyCode, [46, 8, 9, 27, 13]) !== -1 ||
+            (e.keyCode >= 35 && e.keyCode <= 40)) {
+        return;
+    }
+    if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105) && (e.keyCode < 65 || e.keyCode > 90)) {
+        e.preventDefault();
+    }
+});
+/** ONLY CHARACTER **/
+$(document).on('keydown', "input[field-validator='characterField']", function (e) {
+    if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 64, 190, 32]) !== -1 ||
+            (e.keyCode >= 35 && e.keyCode <= 40)) {
+        return;
+    }
+    if ((e.keyCode < 65 || e.keyCode > 90)) {
+        e.preventDefault();
+    }
+});
+/**CHARACTER DOT VALIDATION **/
+$(document).on('change', "input[field-validator='characterField']", function (e) {
+    if ($(this).val() !== "") {
+        var length = $(this).val().length;
+        if ($(this).val().charAt(0) === ".") {
+            $(this).val($(this).val().slice(1, length - 1));
+        }
+        if ($(this).val().charAt(length - 1) === ".") {
+            $(this).val($(this).val().slice(1, length - 2));
+        }
+        $(this).val($(this).val().replace(/\.{2,}/g, ""));
+        $(this).val($(this).val().replace(/\s{2,}/g, ""));
+        $(this).val($(this).val().trim());
+    }
+});
+
+/** ONLY DECIMAL **/
+$(document).on('keypress', "input[field-validator='decimalField']", function (e) {
+    var $this = $(this);
+    var parentdiv = $(this).parent();
+    var decimalPoint = $(this).attr('decimalPlace');
+    var checkFormat = $(parentdiv).hasClass("validDecimalFormat");
+    checkFormat = (!checkFormat) && $(this).attr("validDecimalFormat") !== undefined ? JSON.parse($(this).attr("validDecimalFormat")) : true;
+    var maxlength = $(this).attr("maxlength");
+    var decimalPlace = Number(maxlength) - (Number(decimalPoint) + 1);
+//    ^\d+(\.\d{1,2})?$
+    if ((event.which !== 46 || $this.val().indexOf('.') !== -1) && ((event.which < 48 || event.which > 57) &&
+            (event.which !== 0 && event.which !== 8))) {
+        event.preventDefault();
+    }
+    var text = $(this).val();
+    if (checkFormat && text.indexOf('.') === -1) {
+        if (text.length === decimalPlace) {
+            if (event.which !== 46) {
+                event.preventDefault();
+            }
+        }
+    }
+    if ((event.which === 46) && (text.indexOf('.') === -1)) {
+        setTimeout(function () {
+            if ($this.val().substring($this.val().indexOf('.')).length > 3) {
+                $this.val($this.val().substring(0, $this.val().indexOf('.') + 3));
+            }
+        }, 1);
+    }
+    if ((text.indexOf('.') !== -1) && (text.substring(text.indexOf('.')).length > decimalPoint) &&
+            (event.which !== 0 && event.which !== 8) && ($(this)[0].selectionStart > text.length - 1)) {
+        event.preventDefault();
+    }
+    //Added by Vignesh.G on 14/03/2019 to prevent extra numbers after decimal
+    //Start
+    var number = this.value.split('.');
+    var caratPos = commonUtillity.getSelectionStart(this);
+    var dotPos = this.value.indexOf(".");
+    if (caratPos > dotPos && dotPos > -1 && (number[1].length > (Number(decimalPoint) - 1))) {
+        event.preventDefault();
+        return false;
+    }
+    //End
+});
+$(document).on('keypress', "input[field-validator='amountField']", function (e) {
+    var $this = $(this);
+    var parentdiv = $(this).parent();
+    var text = $this.val();
+    var decimalPoint = $this.attr('decimalPlace');
+    var checkFormat = $(parentdiv).hasClass("validDecimalFormat");
+    var maxlength = $(this).attr("maxlength");
+    var decimalPlace = Number(maxlength) - (Number(decimalPoint) + 1);
+    (event.which !== 46 || text.indexOf('.') !== -1) && ((event.which < 48 || event.which > 57) && (event.which !== 0 && event.which !== 8)) && event.preventDefault();
+    if (checkFormat && text.indexOf('.') === -1) {
+        if (text.length === decimalPlace) {
+            if (event.which !== 46) {
+                event.preventDefault();
+            }
+        }
+    }
+    //Added By Ramesh Singer At 03/09/2018 For Tickets #1438,#1446 
+    //START
+    var number = this.value.split('.');
+    var caratPos = commonUtillity.getSelectionStart(this);
+    var dotPos = this.value.indexOf(".");
+    if (caratPos > dotPos && dotPos > -1 && (number[1].length > (Number(decimalPoint) - 1))) {
+        event.preventDefault();
+        return false;
+    }
+    //END
+    if ((event.which === 46) && (text.indexOf('.') === -1)) {
+        setTimeout(function () {
+            if (text.substring($this.val().indexOf('.')).length > 3) {
+                $this.val(text.substring(0, $this.val().indexOf('.') + 3));
+            }
+        }, 1);
+    }
+    (text.indexOf('.') !== -1) && (text.substring(text.indexOf('.')).length > decimalPoint) && (event.which !== 0 && event.which !== 8) && ($this[0].selectionStart > text.length - 1) && event.preventDefault();
+});
+
+$(document).on('blur', "input[field-validator='decimalField']", function (e) {
+    if (e.currentTarget.readOnly !== true) {
+        var decimalplace = Number($(this).attr('decimalplace'));
+        var parentdiv = $(this).parent();
+        var checkFormat = $(parentdiv).hasClass("validDecimalFormat");
+        checkFormat = (!checkFormat) && $(this).attr("validDecimalFormat") !== undefined ? JSON.parse($(this).attr("validDecimalFormat")) : true;
+        var maxlength = $(this).attr("maxlength");
+        var decimalPlace = Number(maxlength) - (Number(decimalplace) + 1);
+        var field_value = $(this).val() === "" || $(this).val() === "." ? "0.00" : $(this).val();
+        if (checkFormat && field_value.length > 0) {
+            if (field_value.split('.')[0].length > decimalPlace) {
+                $(this).val(Number(0).toFixed(decimalplace));
+                return;
+            }
+        }
+        //modified by vivek for ticket no:558 on 31/08/2018
+        var value = Number(field_value);
+        if (value) {
+            $(this).val(value.toFixed(decimalplace));
+        } else {
+            $(this).val(Number(0).toFixed(decimalplace));
+        }
+        }
+});
+/** MOBILE NO **/
+$(document).on('keydown', "input[field-validator='mobileNumberField']", function (e) {
+    if ($.inArray(e.keyCode, [46, 8, 9, 27, 13]) !== -1 ||
+            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+            (e.keyCode >= 35 && e.keyCode <= 40)) {
+        return;
+    }
+    if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+        e.preventDefault();
+    }
+});
+
+$(document).on('blur', "input[field-validator='mobileNumberField']", function () {
+    var field_id = this.id;
+    var field_value = $(this).val();
+    if (field_value.length !== 10) {
+        errorAlert("Error", "Invalid Mobile Number");
+        document.getElementById(field_id).value = '';
+        return false;
+    }
+});
+
+/** PANCARD NO **/
+
+$(document).on('change', "input[field-validator='panNumberField']", function (e) {
+    var regExp = /[a-zA-z]{5}\d{4}[a-zA-Z]{1}/;
+    var txtpan = $(this).val();
+    if (txtpan.length === 10) {
+        if (!txtpan.match(regExp)) {
+            errorAlert("Error", "Not a valid PAN number");
+            $(this).val('');
+            $(this).focus();
+            event.preventDefault();
+        }
+    } else {
+        errorAlert("Error", "Please enter 10 digits for a valid PAN number");
+        $(this).val('');
+        $(this).focus();
+        event.preventDefault();
+    }
+});
+
+/** CONTAINER NO **/
+$(document).on("keypress", "input[field-validator='containerNumberField']", function (evt) {
+    var charCode = (evt.which) ? evt.which : event.keyCode;
+    var count = evt.target.value.length;
+    if (count < 4) {
+        if ((charCode <= 90 && charCode >= 65) || (charCode <= 122 && charCode >= 97) || (charCode === 8) || (charCode === 9) || (charCode === 27) || (charCode === 13)) {
+            return true;
+        }
+        return false;
+    }
+    if (count <= 10 && count >= 4) {
+        if ((charCode <= 57 && charCode >= 48) || (charCode === 8) || (charCode === 9) || (charCode === 27) || (charCode === 13)) {
+            return true;
+        }
+        return false;
+    }
+    if (count === 11) {/*Modified By Ramesh Singer For Ticket #1257*/
+        if ((charCode === 8) || (charCode === 9) || (charCode === 27) || (charCode === 13)) {
+            return true;
+        } else if (this.selectionEnd === 11 && this.selectionStart === 0) {
+            if ((charCode <= 90 && charCode >= 65) || (charCode <= 122 && charCode >= 97) || (charCode === 8) || (charCode === 9) || (charCode === 27) || (charCode === 13)) {
+                return true;
+            } else {
+                var scope = $(this);
+                (function () {
+                    $(scope).val('');
+                }).async();
+                return true;
+            }
+        }
+        return false;
+    }
+    return false;
+});
+
+
